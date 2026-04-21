@@ -1,65 +1,67 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
 
 const app = express();
-const Customer = require('./models/Customer');
-const Appointment = require('./models/Appointment');
-const Billing = require('./models/Billing');
-const User = require('./models/User');
-
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 
-// MongoDB connection
-mongoose.connect('mongodb://127.0.0.1:27017/spamate')
+// 🔹 MongoDB connection
+mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log("MongoDB Connected"))
 .catch(err => console.log(err));
 
-// test route
-app.get('/', (req, res) => {
-    res.send("SpaMate Backend Running");
-});
-app.post('/addCustomer', async (req, res) => {
-    const customer = new Customer(req.body);
-    await customer.save();
-    res.send(customer);
-});
-app.get('/customers', async (req, res) => {
-    const customers = await Customer.find();
-    res.send(customers);
-});
-app.post('/book', async (req, res) => {
-    const appt = new Appointment(req.body);
-    await appt.save();
-    res.send(appt);
-});
-app.post('/bill', async (req, res) => {
-    const bill = new Billing(req.body);
-    await bill.save();
-    res.send(bill);
-});
-app.post('/register', async (req, res) => {
-    const user = new User(req.body);
-    await user.save();
-    res.send(user);
-});
-app.post('/login', async (req, res) => {
-    const { username, password } = req.body;
-
-    const user = await User.findOne({ username, password });
-
-    if (user) {
-        res.send({ message: "Login success", user });
-    } else {
-        res.send({ message: "Invalid credentials" });
-    }
-});
-app.get('/appointments', async (req, res) => {
-    const data = await Appointment.find();
-    res.send(data);
+// 🔹 Models
+const Customer = mongoose.model("Customer", {
+  name: String
 });
 
-app.listen(5000, () => {
-    console.log("Server running on port 5000");
+const Appointment = mongoose.model("Appointment", {
+  customer: String,
+  service: String,
+  date: String
 });
+
+const Billing = mongoose.model("Billing", {
+  customer: String,
+  amount: Number
+});
+
+// ================= APIs =================
+
+// 👉 Customers
+app.post("/api/customers", async (req, res) => {
+  const data = await Customer.create(req.body);
+  res.json(data);
+});
+
+app.get("/api/customers", async (req, res) => {
+  const data = await Customer.find();
+  res.json(data);
+});
+
+// 👉 Appointments
+app.post("/api/appointments", async (req, res) => {
+  const data = await Appointment.create(req.body);
+  res.json(data);
+});
+
+app.get("/api/appointments", async (req, res) => {
+  const data = await Appointment.find();
+  res.json(data);
+});
+
+// 👉 Billing
+app.post("/api/billing", async (req, res) => {
+  const data = await Billing.create(req.body);
+  res.json(data);
+});
+
+app.get("/api/billing", async (req, res) => {
+  const data = await Billing.find();
+  res.json(data);
+});
+
+// ================= SERVER =================
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log("Server running on", PORT));

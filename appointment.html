@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Appointments</title>
+</head>
+<body style="background:#0f172a;color:white;font-family:Arial;">
+
+<h1>📅 Appointments</h1>
+
+<input id="customer" placeholder="Customer">
+<input id="service" placeholder="Service">
+<input id="date" type="date">
+
+<button onclick="book()">Book</button>
+
+<ul id="list"></ul>
+
+<script>
+const API = "https://spamate-backend.onrender.com";
+
+function book() {
+  fetch(`${API}/appointments`, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      customer: customer.value,
+      service: service.value,
+      date: date.value
+    })
+  }).then(() => location.reload());
+}
+
+fetch(`${API}/appointments`)
+.then(res => res.json())
+.then(data => {
+  data.forEach(a => {
+    const li = document.createElement("li");
+    li.innerText = `${a.customer} - ${a.service} - ${a.date}`;
+    list.appendChild(li);
+  });
+});
+</script>
+
+</body>
+</html>

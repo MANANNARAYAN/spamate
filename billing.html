@@ -1,50 +1,40 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Billing</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<body style="background:#0f172a;color:white;font-family:Arial;">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
+<h1>💰 Billing</h1>
 
-<body class="bg-light">
-<div class="container mt-5">
+<input id="customer" placeholder="Customer">
+<input id="amount" placeholder="Amount">
 
-<h1 class="text-center">Billing</h1>
+<button onclick="add()">Add</button>
 
-<div class="card p-3">
-    <input id="customerId" class="form-control mb-2" placeholder="Customer ID">
-    <input id="amount" class="form-control mb-2" placeholder="Amount">
-
-    <select id="payment" class="form-control mb-3">
-        <option>Cash</option>
-        <option>UPI</option>
-    </select>
-
-    <button class="btn btn-success" onclick="bill()">Generate Bill</button>
-</div>
+<ul id="list"></ul>
 
 <script>
-async function bill() {
-    const amount = parseFloat(document.getElementById('amount').value);
-    const gst = amount * 0.18;
-    const total = amount + gst;
+const API = "https://spamate-backend.onrender.com";
 
-    await fetch('http://localhost:5000/bill', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-            customerId: document.getElementById('customerId').value,
-            amount: total,
-            paymentMethod: document.getElementById('payment').value,
-            date: new Date().toISOString()
-        })
-    });
-
-    alert(`Bill\nAmount: ₹${amount}\nGST: ₹${gst}\nTotal: ₹${total}`);
+function add() {
+  fetch(`${API}/billing`, {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({
+      customer: customer.value,
+      amount: amount.value
+    })
+  }).then(()=>location.reload());
 }
+
+fetch(`${API}/billing`)
+.then(res=>res.json())
+.then(data=>{
+  data.forEach(b=>{
+    const li=document.createElement("li");
+    li.innerText=`${b.customer} - ₹${b.amount}`;
+    list.appendChild(li);
+  });
+});
 </script>
 
-</div>
 </body>
 </html>
