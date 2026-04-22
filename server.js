@@ -3,29 +3,20 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 
 const app = express();
+
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-// 🔹 MongoDB connection (FIXED)
+// ================= DATABASE =================
+
+// Connect MongoDB
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch(err => console.log("❌ DB Error:", err));
+.then(() => console.log("✅ MongoDB Connected"))
+.catch(err => console.log("❌ DB Connection Error:", err));
 
-// 🔹 Connection logs
-mongoose.connection.on("connected", () => {
-  console.log("🔥 DB Connected Successfully");
-});
+// ================= MODELS =================
 
-mongoose.connection.on("error", (err) => {
-  console.log("❌ DB Connection Error:", err);
-});
-
-// 🔹 Root route (important for testing)
-app.get("/", (req, res) => {
-  res.send("API Running 🚀");
-});
-
-// 🔹 Models
 const Customer = mongoose.model("Customer", {
   name: String
 });
@@ -40,37 +31,13 @@ const Billing = mongoose.model("Billing", {
   customer: String,
   amount: Number
 });
-const API = "https://spamate-backend.onrender.com";
 
-async function loadCustomers() {
-  const res = await fetch(API + "/api/customers");
-  const data = await res.json();
+// ================= ROUTES =================
 
-  const list = document.getElementById("customerList");
-  list.innerHTML = "";
-
-  data.forEach(c => {
-    const li = document.createElement("li");
-    li.textContent = c.name;
-    list.appendChild(li);
-  });
-}
-
-async function addCustomer() {
-  const name = document.getElementById("nameInput").value;
-
-  await fetch(API + "/api/customers", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name })
-  });
-
-  loadCustomers(); // refresh list
-}
-
-loadCustomers();
-
-// ================= APIs =================
+// Test route
+app.get("/", (req, res) => {
+  res.send("API Running 🚀");
+});
 
 // 👉 Customers
 app.post("/api/customers", async (req, res) => {
@@ -130,5 +97,9 @@ app.get("/api/billing", async (req, res) => {
 });
 
 // ================= SERVER =================
+
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log("🚀 Server running on", PORT));
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
