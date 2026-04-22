@@ -7,9 +7,22 @@ app.use(cors());
 app.use(express.json());
 
 // 🔹 MongoDB connection
-mongoose.connect(process.env.MONGO_URI)
-.then(() => console.log("MongoDB Connected"))
-.catch(err => console.log(err));
+// 🔹 MongoDB connection
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log("✅ MongoDB Connected"))
+.catch(err => console.log("❌ DB Error:", err));
+
+// 🔹 Extra connection logs (ADD THIS BELOW)
+mongoose.connection.on("connected", () => {
+  console.log("🔥 DB Connected Successfully");
+});
+
+mongoose.connection.on("error", (err) => {
+  console.log("❌ DB Connection Error:", err);
+});
 
 // 🔹 Models
 const Customer = mongoose.model("Customer", {
