@@ -8,10 +8,13 @@ app.use(express.json());
 
 // 🔹 MongoDB connection
 // 🔹 MongoDB connection
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
+mongoose.connection.on("connected", () => {
+  console.log("🔥 DB Connected Successfully");
+});
+
+mongoose.connection.on("error", (err) => {
+  console.log("❌ DB Connection Error:", err);
+});
 .then(() => console.log("✅ MongoDB Connected"))
 .catch(err => console.log("❌ DB Error:", err));
 
