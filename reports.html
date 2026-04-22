@@ -1,16 +1,41 @@
-<button onclick="load()">Load Reports</button>
-<div id="data"></div>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Reports</title>
+</head>
+<body style="background:#0b1b34;color:white;font-family:sans-serif">
+
+<h1>📊 Reports</h1>
+
+<button onclick="loadReports()">Load Reports</button>
+
+<h2>Customers</h2>
+<ul id="customers"></ul>
+
+<h2>Appointments</h2>
+<ul id="appointments"></ul>
+
+<h2>Billing</h2>
+<ul id="billing"></ul>
 
 <script>
 const API = "https://spamate-backend.onrender.com";
 
-async function load() {
-  const a = await fetch(`${API}/api/appointments`).then(r=>r.json());
-  const b = await fetch(`${API}/api/billing`).then(r=>r.json());
+async function loadReports() {
+  const c = await fetch(`${API}/api/customers`).then(r => r.json());
+  const a = await fetch(`${API}/api/appointments`).then(r => r.json());
+  const b = await fetch(`${API}/api/billing`).then(r => r.json());
 
-  data.innerHTML = `
-    <p>Total Appointments: ${a.length}</p>
-    <p>Total Billing Entries: ${b.length}</p>
-  `;
+  document.getElementById("customers").innerHTML =
+    c.map(x => `<li>${x.name}</li>`).join("");
+
+  document.getElementById("appointments").innerHTML =
+    a.map(x => `<li>${x.customer} - ${x.service}</li>`).join("");
+
+  document.getElementById("billing").innerHTML =
+    b.map(x => `<li>${x.customer} - ₹${x.amount}</li>`).join("");
 }
 </script>
+
+</body>
+</html>
