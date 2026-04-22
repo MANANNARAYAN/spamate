@@ -40,6 +40,35 @@ const Billing = mongoose.model("Billing", {
   customer: String,
   amount: Number
 });
+const API = "https://spamate-backend.onrender.com";
+
+async function loadCustomers() {
+  const res = await fetch(API + "/api/customers");
+  const data = await res.json();
+
+  const list = document.getElementById("customerList");
+  list.innerHTML = "";
+
+  data.forEach(c => {
+    const li = document.createElement("li");
+    li.textContent = c.name;
+    list.appendChild(li);
+  });
+}
+
+async function addCustomer() {
+  const name = document.getElementById("nameInput").value;
+
+  await fetch(API + "/api/customers", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name })
+  });
+
+  loadCustomers(); // refresh list
+}
+
+loadCustomers();
 
 // ================= APIs =================
 
