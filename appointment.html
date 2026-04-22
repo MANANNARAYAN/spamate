@@ -1,45 +1,35 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Appointments</title>
-</head>
-<body style="background:#0f172a;color:white;font-family:Arial;">
-
-<h1>📅 Appointments</h1>
-
 <input id="customer" placeholder="Customer">
 <input id="service" placeholder="Service">
 <input id="date" type="date">
-
 <button onclick="book()">Book</button>
 
-<ul id="list"></ul>
+<div id="list"></div>
 
 <script>
 const API = "https://spamate-backend.onrender.com";
 
-function book() {
-  fetch(`${API}/appointments`, {
+async function book() {
+  await fetch(`${API}/api/appointments`, {
     method: "POST",
-    headers: {"Content-Type":"application/json"},
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       customer: customer.value,
       service: service.value,
       date: date.value
     })
-  }).then(() => location.reload());
+  });
+
+  load();
 }
 
-fetch(`${API}/appointments`)
-.then(res => res.json())
-.then(data => {
-  data.forEach(a => {
-    const li = document.createElement("li");
-    li.innerText = `${a.customer} - ${a.service} - ${a.date}`;
-    list.appendChild(li);
-  });
-});
-</script>
+async function load() {
+  const res = await fetch(`${API}/api/appointments`);
+  const data = await res.json();
 
-</body>
-</html>
+  list.innerHTML = data.map(a =>
+    `<p>${a.customer} - ${a.service} - ${a.date}</p>`
+  ).join("");
+}
+
+load();
+</script>

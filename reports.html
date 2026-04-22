@@ -1,29 +1,16 @@
-<!DOCTYPE html>
-<html>
-<body style="background:#0f172a;color:white;font-family:Arial;">
-
-<h1>📈 Reports</h1>
-
 <button onclick="load()">Load Reports</button>
-
-<ul id="list"></ul>
+<div id="data"></div>
 
 <script>
 const API = "https://spamate-backend.onrender.com";
 
-function load(){
-  fetch(`${API}/reports`)
-  .then(res=>res.json())
-  .then(data=>{
-    list.innerHTML="";
-    data.forEach(r=>{
-      const li=document.createElement("li");
-      li.innerText=JSON.stringify(r);
-      list.appendChild(li);
-    });
-  });
+async function load() {
+  const a = await fetch(`${API}/api/appointments`).then(r=>r.json());
+  const b = await fetch(`${API}/api/billing`).then(r=>r.json());
+
+  data.innerHTML = `
+    <p>Total Appointments: ${a.length}</p>
+    <p>Total Billing Entries: ${b.length}</p>
+  `;
 }
 </script>
-
-</body>
-</html>

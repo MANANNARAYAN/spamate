@@ -1,40 +1,33 @@
-<!DOCTYPE html>
-<html>
-<body style="background:#0f172a;color:white;font-family:Arial;">
-
-<h1>💰 Billing</h1>
-
 <input id="customer" placeholder="Customer">
 <input id="amount" placeholder="Amount">
+<button onclick="addBill()">Add</button>
 
-<button onclick="add()">Add</button>
-
-<ul id="list"></ul>
+<div id="list"></div>
 
 <script>
 const API = "https://spamate-backend.onrender.com";
 
-function add() {
-  fetch(`${API}/billing`, {
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
+async function addBill() {
+  await fetch(`${API}/api/billing`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       customer: customer.value,
       amount: amount.value
     })
-  }).then(()=>location.reload());
+  });
+
+  load();
 }
 
-fetch(`${API}/billing`)
-.then(res=>res.json())
-.then(data=>{
-  data.forEach(b=>{
-    const li=document.createElement("li");
-    li.innerText=`${b.customer} - ₹${b.amount}`;
-    list.appendChild(li);
-  });
-});
-</script>
+async function load() {
+  const res = await fetch(`${API}/api/billing`);
+  const data = await res.json();
 
-</body>
-</html>
+  list.innerHTML = data.map(b =>
+    `<p>${b.customer} - ₹${b.amount}</p>`
+  ).join("");
+}
+
+load();
+</script>
